@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -7,10 +7,40 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐛</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --body-bg: #a8d8a8;
+      --canvas-bg: #fef9ef;
+      --brown: #5a3e2b;
+      --overlay-bg: rgba(254, 249, 239, 0.94);
+      --hud-bg: #5a3e2b;
+      --hud-text: #fef9ef;
+      --text: #5a3e2b;
+      --title-shadow: rgba(255,255,255,0.5);
+      --dpad-bg: rgba(90, 62, 43, 0.13);
+      --dpad-btn-bg: rgba(254, 249, 239, 0.88);
+      --dpad-btn-active: #d9cfc4;
+      --input-bg: #fef9ef;
+    }
+
+    [data-theme="dark"] {
+      --body-bg: #1a2d1a;
+      --canvas-bg: #1c261c;
+      --brown: #c8a87a;
+      --overlay-bg: rgba(22, 30, 22, 0.96);
+      --hud-bg: #2a1f10;
+      --hud-text: #e8d8c0;
+      --text: #e8d8c0;
+      --title-shadow: rgba(0,0,0,0.3);
+      --dpad-bg: rgba(200, 168, 122, 0.18);
+      --dpad-btn-bg: rgba(40, 50, 40, 0.9);
+      --dpad-btn-active: #3a4a3a;
+      --input-bg: #2a3a2a;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #a8d8a8;
+      background: var(--body-bg);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -21,17 +51,17 @@
     }
 
     h1.game-title {
-      color: #5a3e2b;
+      color: var(--text);
       font-size: 1.5rem;
       margin-bottom: 10px;
       text-align: center;
-      text-shadow: 1px 2px 0 rgba(255,255,255,0.5);
+      text-shadow: 1px 2px 0 var(--title-shadow);
     }
 
     #game-container {
       position: relative;
       display: inline-block;
-      border: 4px solid #5a3e2b;
+      border: 4px solid var(--brown);
       border-radius: 10px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       width: min(500px, calc(100vw - 32px));
@@ -41,8 +71,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #5a3e2b;
-      color: #fef9ef;
+      background: var(--hud-bg);
+      color: var(--hud-text);
       padding: 5px 10px;
       font-size: 0.95rem;
       letter-spacing: 0.03em;
@@ -100,7 +130,7 @@
 
     canvas {
       display: block;
-      background: #fef9ef;
+      background: var(--canvas-bg);
       width: 100%;
       height: auto;
       border-radius: 0 0 6px 6px;
@@ -114,7 +144,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(254, 249, 239, 0.94);
+      background: var(--overlay-bg);
       text-align: center;
       padding: 10px 20px;
       gap: 6px;
@@ -122,13 +152,13 @@
     }
 
     .overlay h2 {
-      color: #5a3e2b;
+      color: var(--text);
       font-size: 1.6rem;
       line-height: 1.3;
     }
 
     .overlay p {
-      color: #5a3e2b;
+      color: var(--text);
       font-size: 1.05rem;
     }
 
@@ -181,6 +211,51 @@
       15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
       75%  { opacity: 1; }
       100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+    }
+
+    /* Level-up banner */
+    #level-up-banner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: var(--brown);
+      color: #fef9ef;
+      padding: 10px 28px;
+      border-radius: 30px;
+      font-size: 1.4rem;
+      font-family: inherit;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 10;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    #level-up-banner.show {
+      animation: levelPop 1.2s ease forwards;
+    }
+    @keyframes levelPop {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      20%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      35%  { transform: translate(-50%, -50%) scale(1); }
+      70%  { opacity: 1; }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    }
+
+    /* Screen flash on level-up */
+    #level-flash {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      opacity: 0;
+      border-radius: inherit;
+    }
+    #level-flash.flash {
+      animation: flashAnim 0.4s ease forwards;
+    }
+    @keyframes flashAnim {
+      0%   { opacity: 0.35; background: #e9c46a; }
+      100% { opacity: 0; background: #e9c46a; }
     }
 
     /* Game over */
@@ -242,23 +317,52 @@
       font-family: inherit;
       font-size: 1.1rem;
       padding: 8px 16px;
-      border: 2px solid #5a3e2b;
+      border: 2px solid var(--brown);
       border-radius: 20px;
       text-align: center;
       width: 200px;
-      background: #fef9ef;
-      color: #5a3e2b;
+      background: var(--input-bg);
+      color: var(--text);
       outline: none;
     }
     .name-input:focus { border-color: #e63946; }
 
     /* Mobile adjustments */
     @media (hover: none) and (pointer: coarse) {
-      body { padding: 8px; justify-content: flex-start; gap: 8px; }
-      h1.game-title { margin-bottom: 0; }
-      #game-container { width: min(500px, calc(100vw - 16px)); }
-      .dpad { margin-top: auto; padding-bottom: 8px; }
+      body {
+        padding: 8px;
+        justify-content: flex-start;
+        gap: 0;
+        height: 100svh;
+        overflow: hidden;
+      }
+      h1.game-title { margin-bottom: 6px; }
+      #game-container { width: min(500px, calc(100vw - 16px)); flex-shrink: 0; }
+      .dpad { margin-top: auto; padding-bottom: 10px; padding-top: 10px; }
     }
+
+    /* Dark mode toggle */
+    #dark-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(6px);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 100;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #dark-toggle:hover { background: rgba(255,255,255,0.35); }
 
     /* Small screen adjustments */
     @media (max-width: 400px) {
@@ -286,67 +390,63 @@
       .dpad { display: flex; }
     }
 
-    .dpad-cross {
-      display: grid;
-      grid-template-columns: repeat(3, 64px);
-      grid-template-rows: repeat(3, 64px);
-      background: rgba(90, 62, 43, 0.12);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .dpad-cross .dpad-empty {
-      background: transparent;
-    }
-
-    .dpad-cross .dpad-center-dot {
-      background: rgba(254, 249, 239, 0.85);
-      border: 1px solid rgba(90, 62, 43, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .dpad-cross .dpad-center-dot::after {
-      content: '';
-      width: 10px;
-      height: 10px;
+    .dpad-circle {
+      position: relative;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
-      background: rgba(90, 62, 43, 0.25);
+      background: var(--dpad-bg);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22), inset 0 1px 3px rgba(255,255,255,0.3);
+    }
+
+    .dpad-circle::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(90, 62, 43, 0.18);
     }
 
     .dpad-btn {
-      width: 64px;
-      height: 64px;
+      position: absolute;
+      width: 52px;
+      height: 52px;
       padding: 0;
-      border-radius: 0;
-      background: rgba(254, 249, 239, 0.85);
-      border: 1px solid rgba(90, 62, 43, 0.15);
+      border-radius: 50%;
+      background: var(--dpad-btn-bg);
+      border: 1.5px solid rgba(90, 62, 43, 0.25);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      transition: background 0.08s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: background 0.08s, transform 0.08s;
     }
 
-    .dpad-btn:active { background: #d9cfc4; }
+    .dpad-btn:active { background: var(--dpad-btn-active); transform: scale(0.92); }
 
-    #btn-up    { border-radius: 14px 14px 0 0; }
-    #btn-left  { border-radius: 14px 0 0 14px; }
-    #btn-right { border-radius: 0 14px 14px 0; }
-    #btn-down  { border-radius: 0 0 14px 14px; }
+    #btn-up    { top: 6px;    left: 50%; transform: translateX(-50%); }
+    #btn-up:active    { transform: translateX(-50%) scale(0.92); }
+    #btn-down  { bottom: 6px; left: 50%; transform: translateX(-50%); }
+    #btn-down:active  { transform: translateX(-50%) scale(0.92); }
+    #btn-left  { left: 6px;   top: 50%;  transform: translateY(-50%); }
+    #btn-left:active  { transform: translateY(-50%) scale(0.92); }
+    #btn-right { right: 6px;  top: 50%;  transform: translateY(-50%); }
+    #btn-right:active { transform: translateY(-50%) scale(0.92); }
 
     .arrow { width: 0; height: 0; }
-    .arrow-up    { border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 15px solid #5a3e2b; }
-    .arrow-down  { border-left: 10px solid transparent; border-right: 10px solid transparent; border-top:    15px solid #5a3e2b; }
-    .arrow-left  { border-top: 10px solid transparent;  border-bottom: 10px solid transparent; border-right: 15px solid #5a3e2b; }
-    .arrow-right { border-top: 10px solid transparent;  border-bottom: 10px solid transparent; border-left:  15px solid #5a3e2b; }
+    .arrow-up    { border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 13px solid #5a3e2b; }
+    .arrow-down  { border-left: 9px solid transparent; border-right: 9px solid transparent; border-top:    13px solid #5a3e2b; }
+    .arrow-left  { border-top: 9px solid transparent;  border-bottom: 9px solid transparent; border-right: 13px solid #5a3e2b; }
+    .arrow-right { border-top: 9px solid transparent;  border-bottom: 9px solid transparent; border-left:  13px solid #5a3e2b; }
   </style>
 </head>
 <body>
+<button id="dark-toggle" title="Toggle dark mode">🌙</button>
 
 <h1 class="game-title">The Very Hungry Caterpillar</h1>
 
@@ -363,6 +463,9 @@
 
   <!-- Food announcement -->
   <div id="food-announcement"></div>
+
+  <div id="level-up-banner"></div>
+  <div id="level-flash"></div>
 
   <!-- Start screen -->
   <div class="overlay" id="start-screen">
@@ -404,22 +507,18 @@
         <tbody id="lb-body"></tbody>
       </table>
     </div>
-    <button id="play-again-btn">Play Again!</button>
+    <button id="next-round-btn">Next Round →</button>
+    <button id="play-again-btn" style="font-size:1rem; padding:8px 24px; background:#888;">Start Over</button>
   </div>
 </div>
 
 <!-- D-pad controls (visible on mobile only) -->
 <div class="dpad">
-  <div class="dpad-cross">
-    <div class="dpad-empty"></div>
+  <div class="dpad-circle">
     <button class="dpad-btn" id="btn-up"><span class="arrow arrow-up"></span></button>
-    <div class="dpad-empty"></div>
     <button class="dpad-btn" id="btn-left"><span class="arrow arrow-left"></span></button>
-    <div class="dpad-center-dot"></div>
     <button class="dpad-btn" id="btn-right"><span class="arrow arrow-right"></span></button>
-    <div class="dpad-empty"></div>
     <button class="dpad-btn" id="btn-down"><span class="arrow arrow-down"></span></button>
-    <div class="dpad-empty"></div>
   </div>
 </div>
 
@@ -437,7 +536,7 @@ function calcGrid() {
   if (isMobile) {
     const padding   = 8;
     const availW    = window.innerWidth - padding * 2;
-    const availH    = window.innerHeight - 52 /* title */ - 210 /* dpad */ - padding * 2 - 32 /* hud */;
+    const availH    = window.innerHeight - 52 /* title */ - 180 /* dpad+padding */ - padding * 2 - 32 /* hud */;
     GRID_SIZE = Math.floor(Math.min(availW / 20, availH / 20));
     GRID_SIZE = Math.max(14, Math.min(GRID_SIZE, 22));
     COLS = Math.floor(availW / GRID_SIZE);
@@ -488,6 +587,8 @@ function resizeCanvas() {
 }
 resizeCanvas();
 
+const html = document.documentElement;
+
 // =============================================================================
 // 3. GAME STATE
 // =============================================================================
@@ -508,9 +609,11 @@ let currentFood = null;
 let score       = 0;
 let fatness     = 0;
 let currentSpeed = 200;
+let currentLevel = 1;
 
 let wallsEnabled = true;  // persists across games; toggled by the button
 let playerName = 'Player';
+let round = 1;
 
 // =============================================================================
 // 4. INIT
@@ -527,8 +630,9 @@ function initGame() {
   growing      = false;
   score        = 0;
   fatness      = 0;
-  currentSpeed = 200;
+  currentSpeed = Math.max(80, 200 - (round - 1) * 20);
   tickCount    = 0;
+  currentLevel = 1;
   spawnFood();
   updateHUD();
 }
@@ -618,8 +722,13 @@ function update() {
 
 function updateSpeed() {
   let newSpeed = 200;
+  let newLevel = 1;
   for (const t of SPEED_THRESHOLDS) {
-    if (score >= t.score) newSpeed = t.speed;
+    if (score >= t.score) { newSpeed = t.speed; newLevel = t.level; }
+  }
+  if (newLevel !== currentLevel) {
+    currentLevel = newLevel;
+    triggerLevelUp(newLevel);
   }
   if (newSpeed !== currentSpeed) {
     currentSpeed = newSpeed;
@@ -628,12 +737,30 @@ function updateSpeed() {
   }
 }
 
+function triggerLevelUp(level) {
+  // Banner
+  const banner = document.getElementById('level-up-banner');
+  banner.textContent = `⚡ Level ${level}!`;
+  banner.classList.remove('show');
+  void banner.offsetWidth;
+  banner.classList.add('show');
+
+  // Flash
+  const flash = document.getElementById('level-flash');
+  flash.classList.remove('flash');
+  void flash.offsetWidth;
+  flash.classList.add('flash');
+
+  // Sound
+  playLevelUpSound();
+}
+
 // =============================================================================
 // 7. RENDER
 // =============================================================================
 function render() {
   // Background
-  ctx.fillStyle = '#fef9ef';
+  ctx.fillStyle = html.dataset.theme === 'dark' ? '#1c261c' : '#fef9ef';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Faint grid
@@ -1017,6 +1144,25 @@ function playWinSound() {
   bell.stop(now + 2.3);
 }
 
+function playLevelUpSound() {
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
+  [523.3, 659.3, 783.9].forEach((freq, i) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    const t = now + i * 0.1;
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0.0, t);
+    gain.gain.linearRampToValueAtTime(0.22, t + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc.start(t);
+    osc.stop(t + 0.35);
+  });
+}
+
 // =============================================================================
 // 9. INPUT
 // =============================================================================
@@ -1063,6 +1209,7 @@ function dpadPress(d) {
   if (gameState !== STATE.PLAYING) return;
   if (d.x === -lastDir.x && d.y === -lastDir.y) return;
   nextDir = d;
+  if (navigator.vibrate) navigator.vibrate(25);
 }
 
 document.getElementById('btn-up').addEventListener('touchstart',    e => { dpadPress({ x: 0,  y: -1 }); e.preventDefault(); }, { passive: false });
@@ -1129,9 +1276,10 @@ function triggerWin() {
 
 function showWinScreen(winTimeSecs) {
   const hs = getHighScore();
-  document.getElementById('win-score').textContent  = `${score} points`;
+  document.getElementById('win-score').textContent  = `${score} pts — Round ${round}`;
   document.getElementById('win-hs-msg').textContent =
     score >= hs ? '🌟 New High Score!' : `High Score: ${hs}`;
+  document.getElementById('next-round-btn').textContent = `Round ${round + 1} →`;
 
   // Reset the butterfly animation by re-cloning the element
   const old = document.getElementById('butterfly-emoji');
@@ -1213,10 +1361,13 @@ function tick() {
   render();
 }
 
-async function startGame() {
+async function startGame(keepRound = false) {
   await getAudioCtx().resume();
-  const nameInput = document.getElementById('player-name');
-  if (nameInput) playerName = nameInput.value.trim() || 'Player';
+  if (!keepRound) {
+    round = 1;
+    const nameInput = document.getElementById('player-name');
+    if (nameInput) playerName = nameInput.value.trim() || 'Player';
+  }
   document.getElementById('start-screen').style.display    = 'none';
   document.getElementById('gameover-screen').style.display = 'none';
   document.getElementById('win-screen').style.display      = 'none';
@@ -1230,9 +1381,10 @@ async function startGame() {
 // =============================================================================
 // 13. BOOTSTRAP
 // =============================================================================
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn').addEventListener('click', startGame);
-document.getElementById('play-again-btn').addEventListener('click', startGame);
+document.getElementById('start-btn').addEventListener('click', () => startGame(false));
+document.getElementById('restart-btn').addEventListener('click', () => startGame(false));
+document.getElementById('play-again-btn').addEventListener('click', () => startGame(false));
+document.getElementById('next-round-btn').addEventListener('click', () => { round++; startGame(true); });
 
 ['wall-toggle', 'wall-toggle-over'].forEach(id => {
   document.getElementById(id)?.addEventListener('click', () => {
@@ -1243,7 +1395,7 @@ document.getElementById('play-again-btn').addEventListener('click', startGame);
 
 // Draw decorative caterpillar on start screen
 (function initialRender() {
-  ctx.fillStyle = '#fef9ef';
+  ctx.fillStyle = html.dataset.theme === 'dark' ? '#1c261c' : '#fef9ef';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const mid = Math.floor(ROWS / 2);
   for (let i = 0; i < 7; i++) {
@@ -1264,6 +1416,23 @@ document.getElementById('play-again-btn').addEventListener('click', startGame);
 
 updateHUD();
 updateWallToggle();
+
+// Dark mode
+const darkToggle = document.getElementById('dark-toggle');
+
+function applyTheme(theme) {
+  html.dataset.theme = theme;
+  darkToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('vhc_theme', theme);
+}
+
+darkToggle.addEventListener('click', () => {
+  applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+});
+
+// Restore saved theme
+const savedTheme = localStorage.getItem('vhc_theme') || 'light';
+applyTheme(savedTheme);
 </script>
 </body>
 </html>

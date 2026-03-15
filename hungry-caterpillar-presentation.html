@@ -522,6 +522,23 @@
       margin-top: 16px;
       max-width: 680px;
     }
+    .play-btn {
+      margin-top: 8px;
+      background: var(--brown);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+      align-self: flex-start;
+    }
+    .play-btn:hover  { background: #3d2a1d; }
+    .play-btn:active { transform: scale(0.95); }
+    .play-btn.playing { background: var(--teal); }
+
     .sound-card {
       background: white;
       border-radius: 16px;
@@ -977,6 +994,7 @@
             <div class="wave-bar" style="height:30px;animation-delay:0.3s"></div>
             <div class="wave-bar" style="height:24px;animation-delay:0.4s"></div>
           </div>
+          <button class="play-btn" data-sound="healthy">▶ Play</button>
         </div>
       </div>
       <div class="sound-card">
@@ -990,6 +1008,7 @@
             <div class="wave-bar" style="height:28px;animation-delay:0.3s;background:var(--orange)"></div>
             <div class="wave-bar" style="height:14px;animation-delay:0.45s;background:var(--orange)"></div>
           </div>
+          <button class="play-btn" data-sound="junk">▶ Play</button>
         </div>
       </div>
       <div class="sound-card">
@@ -1002,6 +1021,7 @@
             <div class="wave-bar" style="height:22px;animation-delay:0.22s;background:var(--red)"></div>
             <div class="wave-bar" style="height:12px;animation-delay:0.44s;background:var(--red)"></div>
           </div>
+          <button class="play-btn" data-sound="gameover">▶ Play</button>
         </div>
       </div>
       <div class="sound-card">
@@ -1016,6 +1036,7 @@
             <span class="note-pill">C5</span>
             <span class="note-pill">🔔 C6</span>
           </div>
+          <button class="play-btn" data-sound="win">▶ Play</button>
         </div>
       </div>
     </div>
@@ -1072,9 +1093,13 @@
       <span class="chip">📈 6 speed levels</span>
       <span class="chip">🦋 Win animation</span>
       <span class="chip">🎵 Web Audio sounds</span>
-      <span class="chip">🏆 Leaderboard</span>
-      <span class="chip">📱 Mobile friendly</span>
+      <span class="chip">🏆 Leaderboard + names</span>
+      <span class="chip">📱 Mobile + D-pad</span>
       <span class="chip">🧱 Wall toggle</span>
+      <span class="chip">🌙 Dark mode</span>
+      <span class="chip">⚡ Level-up effects</span>
+      <span class="chip">📳 Haptic feedback</span>
+      <span class="chip">🔄 Infinite rounds</span>
     </div>
 
     <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
@@ -1172,6 +1197,81 @@
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
       dx < 0 ? goTo(current + 1, 1) : goTo(current - 1, -1);
     }
+  });
+
+  // Sound demo
+  let demoAudioCtx = null;
+  function getDemoCtx() {
+    if (!demoAudioCtx) demoAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return demoAudioCtx;
+  }
+
+  function playDemo(type) {
+    const ctx = getDemoCtx();
+    ctx.resume().then(() => {
+      const now = ctx.currentTime;
+      if (type === 'healthy') {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now); osc.stop(now + 0.22);
+      } else if (type === 'junk') {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.linearRampToValueAtTime(180, now + 0.08);
+        osc.frequency.linearRampToValueAtTime(380, now + 0.18);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now); osc.stop(now + 0.22);
+      } else if (type === 'gameover') {
+        [400, 300, 200].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'sawtooth';
+          const t = now + i * 0.22;
+          osc.frequency.setValueAtTime(freq, t);
+          osc.frequency.linearRampToValueAtTime(freq * 0.75, t + 0.18);
+          gain.gain.setValueAtTime(0.18, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+          osc.start(t); osc.stop(t + 0.22);
+        });
+      } else if (type === 'win') {
+        [261.6, 329.6, 392, 523.3].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'sine';
+          const t = now + i * 0.18;
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.0, t);
+          gain.gain.linearRampToValueAtTime(0.28, t + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+          osc.start(t); osc.stop(t + 0.55);
+        });
+        const bell = ctx.createOscillator(), bellG = ctx.createGain();
+        bell.connect(bellG); bellG.connect(ctx.destination);
+        bell.type = 'sine'; bell.frequency.setValueAtTime(1046.5, now + 0.72);
+        bellG.gain.setValueAtTime(0.3, now + 0.72);
+        bellG.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        bell.start(now + 0.72); bell.stop(now + 2.3);
+      }
+    });
+  }
+
+  document.querySelectorAll('.play-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const sound = btn.dataset.sound;
+      playDemo(sound);
+      btn.classList.add('playing');
+      btn.textContent = '♪ Playing';
+      setTimeout(() => { btn.classList.remove('playing'); btn.textContent = '▶ Play'; }, sound === 'win' ? 2400 : 350);
+    });
   });
 
   // Sparkles on slide 6

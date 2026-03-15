@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Very Hungry Caterpillar Game — Presentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:  #fef9ef;
+      --brown:  #5a3e2b;
+      --red:    #e63946;
+      --green:  #a8d8a8;
+      --teal:   #2a9d8f;
+      --orange: #f4a261;
+      --yellow: #e9c46a;
+      --dark:   #264653;
+      --seg1:   #e63946;
+      --seg2:   #f4a261;
+      --seg3:   #2a9d8f;
+      --seg4:   #e9c46a;
+      --seg5:   #264653;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--brown);
+      font-family: 'Patrick Hand', cursive, sans-serif;
+    }
+
+    /* ── SLIDE CONTAINER ─────────────────────────────────────── */
+    #deck {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      transform: translateX(60px);
+      background: var(--cream);
+      overflow: hidden;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    #nav {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+      background: var(--brown);
+      border-radius: 50px;
+      padding: 10px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    #nav button {
+      background: var(--red);
+      border: none;
+      color: white;
+      font-family: 'Patrick Hand', cursive;
+      font-size: 1.1rem;
+      padding: 8px 22px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: transform 0.12s, background 0.15s;
+    }
+    #nav button:hover { transform: translateY(-2px); background: #c1121f; }
+    #nav button:disabled { background: #888; cursor: default; transform: none; }
+    #slide-counter {
+      color: var(--cream);
+      font-size: 1rem;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* ── SHARED ELEMENTS ─────────────────────────────────────── */
+    .slide-tag {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      font-size: 0.8rem;
+      color: var(--brown);
+      opacity: 0.4;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .leaf-deco {
+      position: absolute;
+      font-size: 3rem;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    h1.display {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2rem, 5vw, 4rem);
+      color: var(--brown);
+      text-align: center;
+      line-height: 1.1;
+    }
+    h2.section-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      color: var(--brown);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    p.body-text {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--brown);
+      line-height: 1.6;
+      max-width: 680px;
+      text-align: center;
+    }
+
+    /* ── CARD ────────────────────────────────────────────────── */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px 28px;
+      box-shadow: 0 4px 16px rgba(90,62,43,0.12);
+      border: 2.5px solid rgba(90,62,43,0.08);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 1 — TITLE
+    ═══════════════════════════════════════════════════════════ */
+    #slide-1 { background: var(--green); }
+
+    .caterpillar-css {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 32px 0 24px;
+    }
+    .seg {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 3px solid rgba(0,0,0,0.15);
+      position: relative;
+      animation: segBounce 1.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .seg::after {
+      content: '';
+      width: 12px; height: 12px;
+      background: rgba(255,255,255,0.45);
+      border-radius: 50%;
+      position: absolute;
+      top: 8px; left: 8px;
+    }
+    .seg:nth-child(1) { background: var(--seg1); animation-delay: 0s; z-index: 5; }
+    .seg:nth-child(2) { background: var(--seg2); animation-delay: 0.1s; z-index: 4; margin-left: -14px; }
+    .seg:nth-child(3) { background: var(--seg3); animation-delay: 0.2s; z-index: 3; margin-left: -14px; }
+    .seg:nth-child(4) { background: var(--seg4); animation-delay: 0.3s; z-index: 2; margin-left: -14px; }
+    .seg:nth-child(5) { background: var(--seg5); animation-delay: 0.4s; z-index: 1; margin-left: -14px; }
+
+    /* Head eyes */
+    .seg-head::before {
+      content: '';
+      position: absolute;
+      width: 22px; height: 11px;
+      top: 13px; right: 8px;
+      background: radial-gradient(circle at 30% 40%, white 38%, transparent 40%) no-repeat 0 0,
+                  radial-gradient(circle at 70% 40%, white 38%, transparent 40%) no-repeat 14px 0;
+      background-size: 10px 10px, 10px 10px;
+    }
+    .seg-head::after {
+      content: '';
+      position: absolute;
+      width: 22px; height: 11px;
+      top: 13px; right: 8px;
+      background: radial-gradient(circle at 30% 60%, #1a1a1a 40%, transparent 42%) no-repeat 1px 1px,
+                  radial-gradient(circle at 70% 60%, #1a1a1a 40%, transparent 42%) no-repeat 15px 1px;
+      background-size: 8px 8px, 8px 8px;
+    }
+
+    @keyframes segBounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .title-sub {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: var(--brown);
+      opacity: 0.8;
+      margin-top: 8px;
+    }
+    .title-badge {
+      background: var(--brown);
+      color: var(--cream);
+      border-radius: 30px;
+      padding: 8px 24px;
+      font-size: 1rem;
+      margin-top: 20px;
+      display: inline-block;
+    }
+    .food-scatter {
+      position: absolute;
+      font-size: 1.8rem;
+      animation: floatFood 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes floatFood {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%       { transform: translateY(-12px) rotate(8deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 2 — WHAT IS IT
+    ═══════════════════════════════════════════════════════════ */
+    #slide-2 { background: var(--cream); }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 700px;
+      margin-top: 20px;
+    }
+    .concept-card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 3px 12px rgba(90,62,43,0.1);
+      border-top: 4px solid var(--accent, var(--red));
+    }
+    .concept-card .icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+    .concept-card h3 { font-family: 'Fredoka One', cursive; color: var(--brown); font-size: 1.1rem; margin-bottom: 6px; }
+    .concept-card p { font-size: 0.92rem; color: #7a6050; line-height: 1.4; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 3 — HOW TO PLAY
+    ═══════════════════════════════════════════════════════════ */
+    #slide-3 { background: #fff8e7; }
+    .controls-row {
+      display: flex;
+      gap: 20px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .control-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      border-radius: 14px;
+      padding: 14px 20px;
+      box-shadow: 0 2px 10px rgba(90,62,43,0.1);
+      font-size: 1rem;
+      color: var(--brown);
+    }
+    .key-icon {
+      background: var(--brown);
+      color: var(--cream);
+      border-radius: 8px;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .goal-box {
+      background: var(--brown);
+      color: var(--cream);
+      border-radius: 20px;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      text-align: center;
+      margin-top: 12px;
+    }
+    .goal-box strong { color: var(--yellow); font-size: 1.3rem; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 4 — FOOD SYSTEM
+    ═══════════════════════════════════════════════════════════ */
+    #slide-4 { background: var(--cream); }
+    .food-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 16px;
+      max-width: 760px;
+    }
+    .food-col {
+      border-radius: 20px;
+      padding: 20px;
+    }
+    .food-col.healthy { background: #e8f7e8; border: 2.5px solid var(--teal); }
+    .food-col.junk    { background: #fff0f0; border: 2.5px solid var(--red); }
+    .food-col h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .food-col.healthy h3 { color: var(--teal); }
+    .food-col.junk h3    { color: var(--red); }
+    .food-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .food-pill {
+      background: white;
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 0.95rem;
+      color: var(--brown);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      animation: pillBounce 2s ease-in-out infinite;
+    }
+    @keyframes pillBounce {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.06); }
+    }
+    .pts-badge {
+      display: inline-block;
+      background: var(--brown);
+      color: var(--cream);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.9rem;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .food-col.healthy .pts-badge { background: var(--teal); }
+    .food-col.junk    .pts-badge { background: var(--red); }
+    .prob-bar {
+      display: flex;
+      height: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 16px;
+      max-width: 400px;
+    }
+    .prob-healthy { background: var(--teal); width: 70%; }
+    .prob-junk    { background: var(--red);  width: 30%; }
+    .prob-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--brown);
+      margin-top: 4px;
+      max-width: 400px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 5 — GROWING & SPEED
+    ═══════════════════════════════════════════════════════════ */
+    #slide-5 { background: #f0faf5; }
+    .speed-levels {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+      max-width: 580px;
+      width: 100%;
+    }
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      border-radius: 12px;
+      padding: 10px 16px;
+      box-shadow: 0 2px 8px rgba(90,62,43,0.08);
+    }
+    .speed-label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      color: var(--brown);
+      min-width: 70px;
+    }
+    .speed-bar-wrap {
+      flex: 1;
+      height: 10px;
+      background: #eee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .speed-bar {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--teal), var(--red));
+      transition: width 0.6s ease;
+    }
+    .speed-ms {
+      font-size: 0.85rem;
+      color: #999;
+      min-width: 55px;
+      text-align: right;
+    }
+    .fatness-demo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      background: white;
+      border-radius: 16px;
+      padding: 14px 24px;
+      box-shadow: 0 2px 10px rgba(90,62,43,0.1);
+    }
+    .fat-seg {
+      border-radius: 50%;
+      background: var(--seg1);
+      border: 2px solid rgba(0,0,0,0.12);
+      flex-shrink: 0;
+      animation: fatPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes fatPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 6 — WIN ANIMATION
+    ═══════════════════════════════════════════════════════════ */
+    #slide-6 { background: #e8f7e8; }
+    .phases {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .phase-card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      width: 180px;
+      box-shadow: 0 4px 16px rgba(90,62,43,0.12);
+      position: relative;
+    }
+    .phase-num {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--teal);
+      color: white;
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+    }
+    .phase-icon { font-size: 3rem; margin: 8px 0; }
+    .phase-card h3 { font-family: 'Fredoka One', cursive; color: var(--brown); font-size: 1rem; }
+    .phase-card p { font-size: 0.85rem; color: #7a6050; margin-top: 4px; line-height: 1.4; }
+    .phase-arrow {
+      font-size: 2rem;
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      opacity: 0.6;
+    }
+
+    /* CSS butterfly animation */
+    .butterfly-css {
+      font-size: 4rem;
+      animation: butterflyFlap 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes butterflyFlap {
+      0%   { transform: scaleX(1) rotate(-5deg); }
+      100% { transform: scaleX(0.4) rotate(5deg); }
+    }
+
+    /* sparkles */
+    .sparkle-field {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      font-size: 1rem;
+      animation: sparkleFly 3s ease-in-out infinite;
+      opacity: 0.5;
+    }
+    @keyframes sparkleFly {
+      0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+      40%  { opacity: 0.7; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 7 — SOUND DESIGN
+    ═══════════════════════════════════════════════════════════ */
+    #slide-7 { background: var(--cream); }
+    .sound-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+      max-width: 680px;
+    }
+    .sound-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 3px 10px rgba(90,62,43,0.1);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .sound-icon { font-size: 2rem; flex-shrink: 0; }
+    .sound-card h3 { font-family: 'Fredoka One', cursive; color: var(--brown); font-size: 1rem; margin-bottom: 4px; }
+    .sound-card p { font-size: 0.85rem; color: #7a6050; line-height: 1.4; }
+    .wave-viz {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-top: 8px;
+    }
+    .wave-bar {
+      width: 4px;
+      background: var(--teal);
+      border-radius: 2px;
+      animation: wavePulse 0.8s ease-in-out infinite;
+    }
+    @keyframes wavePulse {
+      0%, 100% { transform: scaleY(0.3); }
+      50%       { transform: scaleY(1); }
+    }
+    .arpeggio-notes {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .note-pill {
+      background: var(--yellow);
+      color: var(--brown);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.8rem;
+    }
+    .no-files-badge {
+      background: var(--teal);
+      color: white;
+      border-radius: 30px;
+      padding: 8px 20px;
+      font-size: 1rem;
+      margin-top: 16px;
+      display: inline-block;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 8 — TECH HIGHLIGHTS
+    ═══════════════════════════════════════════════════════════ */
+    #slide-8 { background: var(--dark); }
+    #slide-8 h2.section-title { color: var(--cream); }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+      max-width: 680px;
+    }
+    .tech-card {
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+    .tech-card .tech-icon { font-size: 2.2rem; margin-bottom: 8px; }
+    .tech-card h3 {
+      font-family: 'Fredoka One', cursive;
+      color: var(--yellow);
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+    .tech-card p { font-size: 0.85rem; color: rgba(255,255,255,0.72); line-height: 1.5; }
+    .code-tag {
+      display: inline-block;
+      background: rgba(42,157,143,0.25);
+      color: var(--teal);
+      border: 1px solid var(--teal);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      margin-top: 6px;
+      font-family: monospace;
+    }
+    .zero-deps {
+      margin-top: 18px;
+      color: var(--green);
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SLIDE 9 — TRY IT
+    ═══════════════════════════════════════════════════════════ */
+    #slide-9 { background: var(--brown); }
+    #slide-9 h1.display { color: var(--cream); }
+    #slide-9 p.body-text { color: rgba(255,255,255,0.75); }
+    .try-btn {
+      margin-top: 28px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 18px 52px;
+      font-size: 1.5rem;
+      font-family: 'Fredoka One', cursive;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(230,57,70,0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .try-btn:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 10px 32px rgba(230,57,70,0.55);
+    }
+    .feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 24px;
+      max-width: 600px;
+    }
+    .chip {
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: var(--cream);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 0.9rem;
+    }
+    .big-butterfly {
+      font-size: 6rem;
+      animation: bigFlap 0.7s ease-in-out infinite alternate;
+      display: block;
+      margin-bottom: 8px;
+    }
+    @keyframes bigFlap {
+      0%   { transform: scaleX(1) rotate(-3deg); }
+      100% { transform: scaleX(0.45) rotate(3deg); }
+    }
+
+    /* ── PROGRESS DOTS ───────────────────────────────────────── */
+    #dots {
+      position: fixed;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(90,62,43,0.25);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .dot.active {
+      background: var(--brown);
+      transform: scale(1.4);
+    }
+    /* On dark slides, dots flip color */
+    body.dark-slide .dot { background: rgba(255,255,255,0.3); }
+    body.dark-slide .dot.active { background: var(--cream); }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .concept-grid, .food-columns, .sound-cards, .tech-grid { grid-template-columns: 1fr; }
+      .phases { flex-direction: column; align-items: center; }
+      .phase-arrow { transform: rotate(90deg); }
+      #slide-1 .caterpillar-css .seg { width: 38px; height: 38px; }
+      h1.display { font-size: 1.8rem; }
+      h2.section-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- DOTS -->
+<div id="dots"></div>
+
+<!-- DECK -->
+<div id="deck">
+
+  <!-- ── SLIDE 1: TITLE ─────────────────────────────── -->
+  <div class="slide active" id="slide-1" data-dark="false">
+    <span class="slide-tag">The Very Hungry Caterpillar Game</span>
+
+    <!-- scattered food -->
+    <span class="food-scatter" style="top:8%; left:6%; animation-delay:0s">🍎</span>
+    <span class="food-scatter" style="top:12%; right:8%; animation-delay:0.4s">🍐</span>
+    <span class="food-scatter" style="bottom:14%; left:10%; animation-delay:0.8s">🍓</span>
+    <span class="food-scatter" style="bottom:18%; right:7%; animation-delay:1.2s">🍊</span>
+    <span class="food-scatter" style="top:40%; left:3%; animation-delay:0.6s">🎂</span>
+    <span class="food-scatter" style="top:55%; right:4%; animation-delay:1s">🍦</span>
+
+    <h1 class="display">The Very Hungry<br>Caterpillar Game</h1>
+
+    <div class="caterpillar-css">
+      <div class="seg seg-head"></div>
+      <div class="seg"></div>
+      <div class="seg"></div>
+      <div class="seg"></div>
+      <div class="seg"></div>
+    </div>
+
+    <p class="title-sub">A Snake game inspired by the classic children's book 🐛📖</p>
+    <div class="title-badge">Built with Pure HTML · Canvas · Web Audio</div>
+  </div>
+
+  <!-- ── SLIDE 2: WHAT IS IT ───────────────────────── -->
+  <div class="slide" id="slide-2" data-dark="false">
+    <span class="leaf-deco" style="top:-30px; right:-20px; font-size:8rem">🌿</span>
+    <h2 class="section-title">What is it?</h2>
+    <p class="body-text">
+      A browser game where you guide a colorful caterpillar across a 25×20 grid,
+      eating food to grow and score points — until you transform into a butterfly! 🦋
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="--accent: var(--red)">
+        <span class="icon">🐛</span>
+        <h3>Snake Mechanics</h3>
+        <p>Classic snake gameplay — grow by eating, avoid hitting yourself or walls</p>
+      </div>
+      <div class="concept-card" style="--accent: var(--teal)">
+        <span class="icon">📖</span>
+        <h3>Storybook World</h3>
+        <p>Inspired by Eric Carle's "The Very Hungry Caterpillar" — warm, playful visuals</p>
+      </div>
+      <div class="concept-card" style="--accent: var(--orange)">
+        <span class="icon">🍎</span>
+        <h3>Eat &amp; Grow</h3>
+        <p>Collect fruits and junk food to reach 400 points and complete the journey</p>
+      </div>
+      <div class="concept-card" style="--accent: var(--yellow)">
+        <span class="icon">🦋</span>
+        <h3>Win by Transforming</h3>
+        <p>Hit 400 points and watch the caterpillar metamorphose into a butterfly</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 3: HOW TO PLAY ──────────────────────── -->
+  <div class="slide" id="slide-3" data-dark="false">
+    <span class="leaf-deco" style="bottom:-20px; left:-10px; font-size:8rem">🌱</span>
+    <h2 class="section-title">How to Play</h2>
+
+    <div class="controls-row">
+      <div class="control-item">
+        <div class="key-icon">⬆</div>
+        <div class="key-icon">⬇</div>
+        <div class="key-icon">⬅</div>
+        <div class="key-icon">➡</div>
+        <span>Arrow Keys</span>
+      </div>
+      <div class="control-item">
+        <span style="font-size:1.6rem">👆</span>
+        <span>Swipe on Mobile</span>
+      </div>
+      <div class="control-item">
+        <span style="font-size:1.6rem">🧱</span>
+        <span>Toggle Wall / Wrap Mode</span>
+      </div>
+    </div>
+
+    <div class="goal-box">
+      🎯 Goal: eat enough food to score <strong>400 points</strong><br>
+      Avoid the walls (or wrap through them!) and don't bite yourself 🐛
+    </div>
+
+    <div style="display:flex; gap:16px; margin-top:16px; flex-wrap:wrap; justify-content:center">
+      <div class="card" style="padding:14px 20px; text-align:center">
+        <div style="font-size:1.5rem">🧱</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--brown); font-size:1rem">Walls ON</div>
+        <div style="font-size:0.85rem; color:#7a6050">Hit a wall = game over</div>
+      </div>
+      <div class="card" style="padding:14px 20px; text-align:center; border-top:3px solid var(--teal)">
+        <div style="font-size:1.5rem">🌀</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--teal); font-size:1rem">Wrap ON</div>
+        <div style="font-size:0.85rem; color:#7a6050">Teleport to the other side!</div>
+      </div>
+      <div class="card" style="padding:14px 20px; text-align:center">
+        <div style="font-size:1.5rem">🏆</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--brown); font-size:1rem">Leaderboard</div>
+        <div style="font-size:0.85rem; color:#7a6050">Top 5 fastest wins saved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 4: FOOD SYSTEM ──────────────────────── -->
+  <div class="slide" id="slide-4" data-dark="false">
+    <h2 class="section-title">The Food System</h2>
+
+    <div class="food-columns">
+      <div class="food-col healthy">
+        <h3>🥦 Healthy Food — 10 pts</h3>
+        <div class="food-pills">
+          <span class="food-pill" style="animation-delay:0s">🍎 Apple</span>
+          <span class="food-pill" style="animation-delay:0.2s">🍐 Pear</span>
+          <span class="food-pill" style="animation-delay:0.4s">🍑 Plum</span>
+          <span class="food-pill" style="animation-delay:0.6s">🍓 Strawberry</span>
+          <span class="food-pill" style="animation-delay:0.8s">🍊 Orange</span>
+        </div>
+        <div style="text-align:center">
+          <span class="pts-badge">+10 points each</span>
+        </div>
+      </div>
+      <div class="food-col junk">
+        <h3>🍩 Junk Food — 25 pts</h3>
+        <div class="food-pills">
+          <span class="food-pill" style="animation-delay:0.1s">🎂 Cake</span>
+          <span class="food-pill" style="animation-delay:0.3s">🍦 Ice Cream</span>
+          <span class="food-pill" style="animation-delay:0.5s">🥧 Pie</span>
+          <span class="food-pill" style="animation-delay:0.7s">🌭 Sausage</span>
+          <span class="food-pill" style="animation-delay:0.9s">🧁 Cupcake</span>
+          <span class="food-pill" style="animation-delay:1.1s">🍉 Watermelon</span>
+        </div>
+        <div style="text-align:center">
+          <span class="pts-badge">+25 points each</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px; text-align:center">
+      <p style="font-size:0.9rem; color:var(--brown); margin-bottom:6px">Spawn probability</p>
+      <div class="prob-bar" style="margin:0 auto">
+        <div class="prob-healthy"></div>
+        <div class="prob-junk"></div>
+      </div>
+      <div class="prob-labels" style="margin:0 auto">
+        <span style="color:var(--teal)">70% healthy</span>
+        <span style="color:var(--red)">30% junk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 5: GROWING & SPEED ─────────────────── -->
+  <div class="slide" id="slide-5" data-dark="false">
+    <h2 class="section-title">Growing &amp; Speed</h2>
+
+    <div class="speed-levels">
+      <div class="speed-row">
+        <span class="speed-label">Level 1</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:18%"></div></div>
+        <span class="speed-ms">200 ms</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Level 2</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:32%"></div></div>
+        <span class="speed-ms">175 ms &nbsp;(50 pts)</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Level 3</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:50%"></div></div>
+        <span class="speed-ms">150 ms &nbsp;(100 pts)</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Level 4</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:68%"></div></div>
+        <span class="speed-ms">125 ms &nbsp;(200 pts)</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Level 5</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:82%"></div></div>
+        <span class="speed-ms">100 ms &nbsp;(350 pts)</span>
+      </div>
+      <div class="speed-row">
+        <span class="speed-label">Level 6 🔥</span>
+        <div class="speed-bar-wrap"><div class="speed-bar" style="width:100%"></div></div>
+        <span class="speed-ms">80 ms &nbsp;(500 pts)</span>
+      </div>
+    </div>
+
+    <div class="fatness-demo">
+      <span style="font-size:0.9rem; color:var(--brown); margin-right:4px">Fatness:</span>
+      <div class="fat-seg" style="width:20px;height:20px;animation-delay:0s;background:var(--seg1)"></div>
+      <div class="fat-seg" style="width:26px;height:26px;animation-delay:0.15s;background:var(--seg2)"></div>
+      <div class="fat-seg" style="width:32px;height:32px;animation-delay:0.3s;background:var(--seg3)"></div>
+      <div class="fat-seg" style="width:40px;height:40px;animation-delay:0.45s;background:var(--seg4)"></div>
+      <div class="fat-seg" style="width:50px;height:50px;animation-delay:0.6s;background:var(--seg5)"></div>
+      <span style="font-size:0.85rem; color:#7a6050; margin-left:8px">Segments grow fatter as you eat!</span>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 6: WIN ANIMATION ────────────────────── -->
+  <div class="slide" id="slide-6" data-dark="false">
+    <div class="sparkle-field" id="sparkle-field"></div>
+    <h2 class="section-title">The Win Animation 🎬</h2>
+
+    <div class="phases">
+      <div class="phase-card">
+        <div class="phase-num">1</div>
+        <div class="phase-icon">🐛</div>
+        <h3>Fade Out</h3>
+        <p>The caterpillar fades away over 600ms</p>
+      </div>
+      <div class="phase-arrow">→</div>
+      <div class="phase-card">
+        <div class="phase-num">2</div>
+        <div class="phase-icon">🫘</div>
+        <h3>Cocoon</h3>
+        <p>A silk-wrapped cocoon wobbles into view (500–1400ms)</p>
+      </div>
+      <div class="phase-arrow">→</div>
+      <div class="phase-card">
+        <div class="phase-num">3</div>
+        <div class="phase-icon butterfly-css">🦋</div>
+        <h3>Butterfly!</h3>
+        <p>Wings flap, sparkles fill the screen (1300–2400ms)</p>
+      </div>
+    </div>
+
+    <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
+      <div class="card" style="text-align:center; padding:12px 20px">
+        <div style="font-size:0.85rem; color:#7a6050">Canvas rendering via</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--brown)">requestAnimationFrame</div>
+      </div>
+      <div class="card" style="text-align:center; padding:12px 20px">
+        <div style="font-size:0.85rem; color:#7a6050">Butterfly drawn with</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--brown)">bezierCurveTo()</div>
+      </div>
+      <div class="card" style="text-align:center; padding:12px 20px">
+        <div style="font-size:0.85rem; color:#7a6050">16 sparkle particles,</div>
+        <div style="font-family:'Fredoka One',cursive; color:var(--brown)">seeded by time</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 7: SOUND DESIGN ─────────────────────── -->
+  <div class="slide" id="slide-7" data-dark="false">
+    <h2 class="section-title">Sound Design 🎵</h2>
+
+    <div class="sound-cards">
+      <div class="sound-card">
+        <span class="sound-icon">🍎</span>
+        <div>
+          <h3>Healthy Eat</h3>
+          <p>Cheerful rising tone: 440Hz → 880Hz</p>
+          <div class="wave-viz">
+            <div class="wave-bar" style="height:10px;animation-delay:0s"></div>
+            <div class="wave-bar" style="height:18px;animation-delay:0.1s"></div>
+            <div class="wave-bar" style="height:24px;animation-delay:0.2s"></div>
+            <div class="wave-bar" style="height:30px;animation-delay:0.3s"></div>
+            <div class="wave-bar" style="height:24px;animation-delay:0.4s"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sound-card">
+        <span class="sound-icon">🎂</span>
+        <div>
+          <h3>Junk Food Eat</h3>
+          <p>Wobbly sine: 300 → 180 → 380Hz</p>
+          <div class="wave-viz">
+            <div class="wave-bar" style="height:20px;animation-delay:0s;background:var(--orange)"></div>
+            <div class="wave-bar" style="height:10px;animation-delay:0.15s;background:var(--orange)"></div>
+            <div class="wave-bar" style="height:28px;animation-delay:0.3s;background:var(--orange)"></div>
+            <div class="wave-bar" style="height:14px;animation-delay:0.45s;background:var(--orange)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sound-card">
+        <span class="sound-icon">💀</span>
+        <div>
+          <h3>Game Over</h3>
+          <p>Sawtooth descent: 400 → 300 → 200Hz in three pulses</p>
+          <div class="wave-viz">
+            <div class="wave-bar" style="height:30px;animation-delay:0s;background:var(--red)"></div>
+            <div class="wave-bar" style="height:22px;animation-delay:0.22s;background:var(--red)"></div>
+            <div class="wave-bar" style="height:12px;animation-delay:0.44s;background:var(--red)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sound-card">
+        <span class="sound-icon">🏆</span>
+        <div>
+          <h3>Win Arpeggio</h3>
+          <p>Triumphant C major arpeggio + bell</p>
+          <div class="arpeggio-notes">
+            <span class="note-pill">C4</span>
+            <span class="note-pill">E4</span>
+            <span class="note-pill">G4</span>
+            <span class="note-pill">C5</span>
+            <span class="note-pill">🔔 C6</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span class="no-files-badge">✨ Zero audio files — all synthesized via Web Audio API</span>
+  </div>
+
+  <!-- ── SLIDE 8: TECH HIGHLIGHTS ──────────────────── -->
+  <div class="slide" id="slide-8" data-dark="true">
+    <h2 class="section-title">Tech Highlights</h2>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">🖼️</div>
+        <h3>Canvas 2D API</h3>
+        <p>All rendering — caterpillar, food, grid, butterfly, sparkles — drawn entirely via canvas context calls</p>
+        <span class="code-tag">getContext('2d')</span>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🔊</div>
+        <h3>Web Audio API</h3>
+        <p>OscillatorNode + GainNode chained for real-time sound synthesis. No audio files at all.</p>
+        <span class="code-tag">AudioContext</span>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">💾</div>
+        <h3>localStorage</h3>
+        <p>High score and top-5 leaderboard (fastest wins) persist across sessions with JSON serialization</p>
+        <span class="code-tag">localStorage.setItem</span>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📱</div>
+        <h3>Touch Support</h3>
+        <p>touchstart + touchend events detect swipe direction. Works on any mobile browser.</p>
+        <span class="code-tag">touchend → delta</span>
+      </div>
+    </div>
+
+    <div class="zero-deps">⚡ Zero dependencies · One HTML file · ~1050 lines</div>
+  </div>
+
+  <!-- ── SLIDE 9: TRY IT ───────────────────────────── -->
+  <div class="slide" id="slide-9" data-dark="true">
+    <span class="big-butterfly">🦋</span>
+    <h1 class="display">Ready to Play?</h1>
+    <p class="body-text" style="margin-top:12px">
+      Open <strong style="color:var(--yellow)">hungry-caterpillar.html</strong> in your browser
+      and guide the caterpillar to its beautiful destiny!
+    </p>
+
+    <div class="feature-chips">
+      <span class="chip">🐛 Snake mechanics</span>
+      <span class="chip">🍎 11 foods</span>
+      <span class="chip">📈 6 speed levels</span>
+      <span class="chip">🦋 Win animation</span>
+      <span class="chip">🎵 Web Audio sounds</span>
+      <span class="chip">🏆 Leaderboard</span>
+      <span class="chip">📱 Mobile friendly</span>
+      <span class="chip">🧱 Wall toggle</span>
+    </div>
+
+    <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
+      <div style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15); border-radius:16px; padding:14px 24px; text-align:center">
+        <div style="color:var(--yellow); font-family:'Fredoka One',cursive; font-size:1.2rem">400 pts</div>
+        <div style="color:rgba(255,255,255,0.6); font-size:0.85rem">to win</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15); border-radius:16px; padding:14px 24px; text-align:center">
+        <div style="color:var(--yellow); font-family:'Fredoka One',cursive; font-size:1.2rem">25×20</div>
+        <div style="color:rgba(255,255,255,0.6); font-size:0.85rem">grid</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15); border-radius:16px; padding:14px 24px; text-align:center">
+        <div style="color:var(--yellow); font-family:'Fredoka One',cursive; font-size:1.2rem">80 ms</div>
+        <div style="color:rgba(255,255,255,0.6); font-size:0.85rem">max speed</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<nav id="nav">
+  <button id="prev-btn" disabled>← Prev</button>
+  <span id="slide-counter">1 / 9</span>
+  <button id="next-btn">Next →</button>
+</nav>
+
+<script>
+  const TOTAL = 9;
+  let current = 1;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.title = `Slide ${i}`;
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n, direction = 1) {
+    if (n < 1 || n > TOTAL || n === current) return;
+
+    const prev = document.getElementById(`slide-${current}`);
+    const next = document.getElementById(`slide-${n}`);
+
+    prev.classList.remove('active');
+    prev.classList.add('exit-left');
+    setTimeout(() => prev.classList.remove('exit-left'), 600);
+
+    next.style.transform = direction > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+    next.style.transition = 'none';
+    next.classList.add('active');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        next.style.transition = '';
+        next.style.transform = '';
+      });
+    });
+
+    current = n;
+    updateUI();
+  }
+
+  function updateUI() {
+    document.getElementById('slide-counter').textContent = `${current} / ${TOTAL}`;
+    document.getElementById('prev-btn').disabled = current === 1;
+    document.getElementById('next-btn').disabled = current === TOTAL;
+
+    // Update dots
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i + 1 === current);
+    });
+
+    // Dark slide body class
+    const slide = document.getElementById(`slide-${current}`);
+    document.body.classList.toggle('dark-slide', slide.dataset.dark === 'true');
+  }
+
+  document.getElementById('prev-btn').addEventListener('click', () => goTo(current - 1, -1));
+  document.getElementById('next-btn').addEventListener('click', () => goTo(current + 1, 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1, 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  goTo(current - 1, -1);
+  });
+
+  // Touch swipe on full page
+  let tx = 0, ty = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      dx < 0 ? goTo(current + 1, 1) : goTo(current - 1, -1);
+    }
+  });
+
+  // Sparkles on slide 6
+  (function buildSparkles() {
+    const field = document.getElementById('sparkle-field');
+    const sparks = ['✨','⭐','🌟','💫'];
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('span');
+      s.className = 'sparkle';
+      s.textContent = sparks[i % sparks.length];
+      s.style.left  = Math.random() * 100 + '%';
+      s.style.top   = Math.random() * 100 + '%';
+      s.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+      s.style.setProperty('--dy', (Math.random() * 120 - 60) + 'px');
+      s.style.animationDelay = (Math.random() * 2) + 's';
+      s.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+      field.appendChild(s);
+    }
+  })();
+
+  // Stagger food-pill animations
+  document.querySelectorAll('.food-pill').forEach((el, i) => {
+    el.style.animationDelay = (i * 0.18) + 's';
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

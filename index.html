@@ -251,6 +251,12 @@
     }
     .name-input:focus { border-color: #e63946; }
 
+    /* Mobile adjustments */
+    @media (hover: none) and (pointer: coarse) {
+      body { padding: 6px; }
+      #game-container { width: min(500px, calc(100vw - 12px)); }
+    }
+
     /* Small screen adjustments */
     @media (max-width: 400px) {
       h1.game-title { font-size: 1.2rem; margin-bottom: 6px; }
@@ -263,7 +269,7 @@
       #leaderboard { padding: 6px 10px; min-width: unset; width: 100%; }
       #lb-table { font-size: 0.8rem; }
       button { font-size: 1rem; padding: 10px 28px; }
-      .dpad-btn { width: 56px; height: 56px; font-size: 1.4rem; }
+      .dpad-btn { width: 56px; height: 56px; }
     }
 
     /* D-pad — shown only on touch devices */

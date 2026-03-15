@@ -278,58 +278,72 @@
     /* D-pad — shown only on touch devices */
     .dpad {
       display: none;
-      flex-direction: column;
       align-items: center;
-      gap: 6px;
-      margin-top: 14px;
+      justify-content: center;
     }
 
     @media (hover: none) and (pointer: coarse) {
       .dpad { display: flex; }
     }
 
-    .dpad-row {
+    .dpad-cross {
+      display: grid;
+      grid-template-columns: repeat(3, 64px);
+      grid-template-rows: repeat(3, 64px);
+      background: rgba(90, 62, 43, 0.12);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .dpad-cross .dpad-empty {
+      background: transparent;
+    }
+
+    .dpad-cross .dpad-center-dot {
+      background: rgba(254, 249, 239, 0.85);
+      border: 1px solid rgba(90, 62, 43, 0.15);
       display: flex;
-      gap: 6px;
       align-items: center;
+      justify-content: center;
+    }
+
+    .dpad-cross .dpad-center-dot::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(90, 62, 43, 0.25);
     }
 
     .dpad-btn {
       width: 64px;
       height: 64px;
       padding: 0;
-      border-radius: 50%;
-      background: rgba(254, 249, 239, 0.92);
-      border: 2px solid #5a3e2b;
+      border-radius: 0;
+      background: rgba(254, 249, 239, 0.85);
+      border: 1px solid rgba(90, 62, 43, 0.15);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.18);
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      transition: transform 0.08s, box-shadow 0.08s, background 0.08s;
+      transition: background 0.08s;
     }
 
-    .dpad-btn:active {
-      background: #e8dfd0;
-      transform: scale(0.9);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    }
+    .dpad-btn:active { background: #d9cfc4; }
 
-    .arrow {
-      width: 0;
-      height: 0;
-    }
+    #btn-up    { border-radius: 14px 14px 0 0; }
+    #btn-left  { border-radius: 14px 0 0 14px; }
+    #btn-right { border-radius: 0 14px 14px 0; }
+    #btn-down  { border-radius: 0 0 14px 14px; }
+
+    .arrow { width: 0; height: 0; }
     .arrow-up    { border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 15px solid #5a3e2b; }
     .arrow-down  { border-left: 10px solid transparent; border-right: 10px solid transparent; border-top:    15px solid #5a3e2b; }
-    .arrow-left  { border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right:  15px solid #5a3e2b; }
-    .arrow-right { border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left:   15px solid #5a3e2b; }
-
-    .dpad-center {
-      width: 64px;
-      height: 64px;
-    }
+    .arrow-left  { border-top: 10px solid transparent;  border-bottom: 10px solid transparent; border-right: 15px solid #5a3e2b; }
+    .arrow-right { border-top: 10px solid transparent;  border-bottom: 10px solid transparent; border-left:  15px solid #5a3e2b; }
   </style>
 </head>
 <body>
@@ -396,13 +410,17 @@
 
 <!-- D-pad controls (visible on mobile only) -->
 <div class="dpad">
-  <button class="dpad-btn" id="btn-up"><span class="arrow arrow-up"></span></button>
-  <div class="dpad-row">
+  <div class="dpad-cross">
+    <div class="dpad-empty"></div>
+    <button class="dpad-btn" id="btn-up"><span class="arrow arrow-up"></span></button>
+    <div class="dpad-empty"></div>
     <button class="dpad-btn" id="btn-left"><span class="arrow arrow-left"></span></button>
-    <div class="dpad-center"></div>
+    <div class="dpad-center-dot"></div>
     <button class="dpad-btn" id="btn-right"><span class="arrow arrow-right"></span></button>
+    <div class="dpad-empty"></div>
+    <button class="dpad-btn" id="btn-down"><span class="arrow arrow-down"></span></button>
+    <div class="dpad-empty"></div>
   </div>
-  <button class="dpad-btn" id="btn-down"><span class="arrow arrow-down"></span></button>
 </div>
 
 <script>

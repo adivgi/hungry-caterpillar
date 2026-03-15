@@ -409,10 +409,28 @@
 // =============================================================================
 // 1. CONSTANTS
 // =============================================================================
-const GRID_SIZE = 20;
-const COLS = 25;
-const ROWS = 20;
 const WIN_SCORE = 400;
+
+// Dynamic grid — calculated based on screen size
+let GRID_SIZE, COLS, ROWS;
+
+function calcGrid() {
+  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (isMobile) {
+    const padding   = 8;
+    const availW    = window.innerWidth - padding * 2;
+    const availH    = window.innerHeight - 52 /* title */ - 210 /* dpad */ - padding * 2 - 32 /* hud */;
+    GRID_SIZE = Math.floor(Math.min(availW / 20, availH / 20));
+    GRID_SIZE = Math.max(14, Math.min(GRID_SIZE, 22));
+    COLS = Math.floor(availW / GRID_SIZE);
+    ROWS = Math.floor(availH / GRID_SIZE);
+  } else {
+    GRID_SIZE = 20;
+    COLS      = 25;
+    ROWS      = 20;
+  }
+}
+calcGrid();
 
 const SEGMENT_COLORS = ['#e63946', '#f4a261', '#2a9d8f', '#e9c46a', '#264653'];
 
@@ -444,8 +462,13 @@ const FOODS = [
 // =============================================================================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-canvas.width  = COLS * GRID_SIZE;
-canvas.height = ROWS * GRID_SIZE;
+
+function resizeCanvas() {
+  calcGrid();
+  canvas.width  = COLS * GRID_SIZE;
+  canvas.height = ROWS * GRID_SIZE;
+}
+resizeCanvas();
 
 // =============================================================================
 // 3. GAME STATE
@@ -892,14 +915,22 @@ function drawFood() {
 // =============================================================================
 // 8. SOUND
 // =============================================================================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
 
 function playEatSound(isJunk) {
-  const now  = audioCtx.currentTime;
-  const osc  = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+  const ctx  = getAudioCtx();
+  const now  = ctx.currentTime;
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
   osc.connect(gain);
-  gain.connect(audioCtx.destination);
+  gain.connect(ctx.destination);
 
   if (isJunk) {
     osc.type = 'sine';
@@ -919,12 +950,13 @@ function playEatSound(isJunk) {
 }
 
 function playGameOverSound() {
-  const now = audioCtx.currentTime;
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
   [400, 300, 200].forEach((freq, i) => {
-    const osc  = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(ctx.destination);
     osc.type = 'sawtooth';
     const t = now + i * 0.22;
     osc.frequency.setValueAtTime(freq, t);
@@ -937,13 +969,14 @@ function playGameOverSound() {
 }
 
 function playWinSound() {
-  const now = audioCtx.currentTime;
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
   // Ascending triumphant arpeggio: C4-E4-G4-C5
   [261.6, 329.6, 392, 523.3].forEach((freq, i) => {
-    const osc  = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(ctx.destination);
     osc.type = 'sine';
     const t = now + i * 0.18;
     osc.frequency.setValueAtTime(freq, t);
@@ -954,10 +987,10 @@ function playWinSound() {
     osc.stop(t + 0.55);
   });
   // Final long bell note
-  const bell  = audioCtx.createOscillator();
-  const bellG = audioCtx.createGain();
+  const bell  = ctx.createOscillator();
+  const bellG = ctx.createGain();
   bell.connect(bellG);
-  bellG.connect(audioCtx.destination);
+  bellG.connect(ctx.destination);
   bell.type = 'sine';
   bell.frequency.setValueAtTime(1046.5, now + 0.72); // C6
   bellG.gain.setValueAtTime(0.3, now + 0.72);
@@ -1162,8 +1195,8 @@ function tick() {
   render();
 }
 
-function startGame() {
-  audioCtx.resume();
+async function startGame() {
+  await getAudioCtx().resume();
   const nameInput = document.getElementById('player-name');
   if (nameInput) playerName = nameInput.value.trim() || 'Player';
   document.getElementById('start-screen').style.display    = 'none';

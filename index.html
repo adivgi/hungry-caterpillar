@@ -333,12 +333,18 @@
         padding: 8px;
         justify-content: flex-start;
         gap: 0;
-        height: 100svh;
+        height: 100dvh;
         overflow: hidden;
       }
-      h1.game-title { margin-bottom: 6px; }
-      #game-container { width: min(500px, calc(100vw - 16px)); flex-shrink: 0; }
-      .dpad { margin-top: auto; padding-bottom: 10px; padding-top: 10px; }
+      h1.game-title { margin-bottom: 6px; flex-shrink: 0; }
+      #game-container {
+        width: min(500px, calc(100vw - 16px));
+        flex-shrink: 0;
+        max-height: calc(100dvh - 56px - 196px);
+        overflow: hidden;
+      }
+      canvas { max-height: 100%; }
+      .dpad { margin-top: auto; padding-bottom: 10px; padding-top: 10px; flex-shrink: 0; }
     }
 
     /* Dark mode toggle */
@@ -536,7 +542,7 @@ function calcGrid() {
   if (isMobile) {
     const padding   = 8;
     const availW    = window.innerWidth - padding * 2;
-    const availH    = window.innerHeight - 52 /* title */ - 180 /* dpad+padding */ - padding * 2 - 32 /* hud */;
+    const availH    = window.innerHeight - 56 /* title */ - 196 /* dpad+padding */ - padding * 2 - 36 /* hud */;
     GRID_SIZE = Math.floor(Math.min(availW / 20, availH / 20));
     GRID_SIZE = Math.max(14, Math.min(GRID_SIZE, 22));
     COLS = Math.floor(availW / GRID_SIZE);

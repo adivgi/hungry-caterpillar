@@ -77,6 +77,8 @@
       font-size: 0.95rem;
       letter-spacing: 0.03em;
       gap: 8px;
+      position: relative;
+      z-index: 20;
     }
 
     #score-display { min-width: 80px; }
@@ -262,7 +264,13 @@
     #gameover-screen .score-big { font-size: 2.5rem; color: #e63946; }
 
     /* Win screen */
-    #win-screen { background: rgba(230, 255, 230, 0.96); }
+    #win-screen {
+      background: rgba(230, 255, 230, 0.96);
+      justify-content: flex-start;
+      padding-top: 10px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     #win-screen h2 { color: #2a7a2a; font-size: 1.8rem; }
 
     #butterfly-emoji {
@@ -385,7 +393,7 @@
     }
 
     @media (hover: none) and (pointer: coarse) {
-      .dpad { display: flex; }
+      .dpad.playing { display: flex; }
     }
 
     .dpad-circle {
@@ -1245,6 +1253,7 @@ function triggerGameOver() {
   clearInterval(gameLoop);
   gameLoop = null;
   gameState = STATE.GAMEOVER;
+  document.querySelector('.dpad').classList.remove('playing');
   playGameOverSound();
   saveHighScore();
 
@@ -1260,6 +1269,7 @@ function triggerWin() {
   clearInterval(gameLoop);
   gameLoop = null;
   gameState = STATE.WIN;
+  document.querySelector('.dpad').classList.remove('playing');
   winStartTime = Date.now();
   const winTimeSecs = (winStartTime - gameStartTime) / 1000;
   playWinSound();
@@ -1376,6 +1386,7 @@ async function startGame(keepRound = false) {
   document.getElementById('start-screen').style.display    = 'none';
   document.getElementById('gameover-screen').style.display = 'none';
   document.getElementById('win-screen').style.display      = 'none';
+  document.querySelector('.dpad').classList.add('playing');
   initGame();
   gameStartTime = Date.now();
   gameState = STATE.PLAYING;

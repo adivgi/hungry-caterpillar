@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Very Hungry Caterpillar Game</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐛</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
@@ -338,6 +338,7 @@
     @media (pointer: coarse) {
       body {
         padding: 6px;
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
         justify-content: center;
         gap: 6px;
         height: 100dvh;
@@ -541,8 +542,10 @@ function calcGrid() {
   const isMobile = window.matchMedia('(pointer: coarse)').matches;
   if (isMobile) {
     const containerW = window.innerWidth - 12; // 6px padding each side
-    // title(28) + dpad(160) + padding(12) + hud(32) + gaps(18) + buffer(10)
-    const availH = window.innerHeight - 260;
+    // Use visualViewport for accurate visible height (accounts for Android nav bar + iOS toolbar)
+    const vh = window.visualViewport?.height ?? window.innerHeight;
+    // title(30) + hud(32) + dpad(160) + gaps(18) + padding(12) + iOS safe-area(~34) + buffer
+    const availH = vh - 340;
     GRID_SIZE = Math.floor(Math.min(containerW / 20, availH / 20));
     GRID_SIZE = Math.max(14, Math.min(GRID_SIZE, 22));
     COLS = Math.floor(containerW / GRID_SIZE); // fill container exactly
@@ -600,6 +603,10 @@ function resizeCanvas() {
   }
 }
 resizeCanvas();
+
+// Recalculate on resize and when visualViewport changes (mobile browser chrome show/hide)
+window.addEventListener('resize', resizeCanvas);
+window.visualViewport?.addEventListener('resize', resizeCanvas);
 
 const html = document.documentElement;
 

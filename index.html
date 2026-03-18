@@ -344,28 +344,18 @@
       .dpad { flex-shrink: 0; margin-top: 4px; }
     }
 
-    /* Dark mode toggle */
+    /* Dark mode toggle — lives in HUD */
     #dark-toggle {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      backdrop-filter: blur(6px);
-      border: 1.5px solid rgba(255,255,255,0.35);
-      font-size: 1.3rem;
+      background: none;
+      border: none;
+      font-size: 1rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 100;
-      transition: background 0.2s;
+      padding: 0 2px;
+      line-height: 1;
+      opacity: 0.85;
       -webkit-tap-highlight-color: transparent;
     }
-    #dark-toggle:hover { background: rgba(255,255,255,0.35); }
+    #dark-toggle:hover { opacity: 1; }
 
     /* Small screen adjustments */
     @media (max-width: 400px) {
@@ -449,8 +439,6 @@
   </style>
 </head>
 <body>
-<button id="dark-toggle" title="Toggle dark mode">🌙</button>
-
 <h1 class="game-title">The Very Hungry Caterpillar</h1>
 
 <div id="game-container">
@@ -459,6 +447,7 @@
     <span id="score-display">Score: 0</span>
     <span id="hs-display">Best: 0</span>
     <span id="level-display">Level 1</span>
+    <button id="dark-toggle" title="Toggle dark mode">🌙</button>
   </div>
 
   <!-- Canvas -->

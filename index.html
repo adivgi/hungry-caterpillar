@@ -330,31 +330,18 @@
     /* Mobile adjustments */
     @media (hover: none) and (pointer: coarse) {
       body {
-        padding: 8px;
-        justify-content: flex-start;
-        gap: 8px;
+        padding: 6px;
+        justify-content: center;
+        gap: 6px;
         height: 100dvh;
         overflow: hidden;
       }
-      h1.game-title { margin-bottom: 0; flex-shrink: 0; }
+      h1.game-title { margin-bottom: 0; flex-shrink: 0; font-size: 1.2rem; }
       #game-container {
-        width: min(500px, calc(100vw - 16px));
-        flex: 1;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
+        width: min(500px, calc(100vw - 12px));
+        flex-shrink: 0;
       }
-      canvas {
-        flex: 1;
-        min-height: 0;
-        width: auto !important;
-        height: auto !important;
-        max-width: 100%;
-        max-height: 100%;
-        margin: 0 auto;
-      }
-      .dpad { flex-shrink: 0; margin-top: 4px; }
+      .dpad { flex-shrink: 0; }
     }
 
     /* Dark mode toggle — lives in HUD */
@@ -545,7 +532,7 @@ function calcGrid() {
   if (isMobile) {
     const padding   = 8;
     const availW    = window.innerWidth - padding * 2;
-    const availH    = window.innerHeight - 56 /* title */ - 196 /* dpad+padding */ - padding * 2 - 36 /* hud */;
+    const availH    = window.innerHeight - 60 /* title */ - 210 /* dpad */ - padding * 2 - 36 /* hud */ - 30 /* gaps */;
     GRID_SIZE = Math.floor(Math.min(availW / 20, availH / 20));
     GRID_SIZE = Math.max(14, Math.min(GRID_SIZE, 22));
     COLS = Math.floor(availW / GRID_SIZE);
@@ -593,7 +580,7 @@ function resizeCanvas() {
   calcGrid();
   canvas.width  = COLS * GRID_SIZE;
   canvas.height = ROWS * GRID_SIZE;
-  canvas.style.aspectRatio = `${canvas.width} / ${canvas.height}`;
+
 }
 resizeCanvas();
 

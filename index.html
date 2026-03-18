@@ -336,7 +336,7 @@
     .name-input:focus { border-color: #e63946; }
 
     /* Mobile adjustments */
-    @media (hover: none) and (pointer: coarse) {
+    @media (pointer: coarse) {
       body {
         padding: 6px;
         justify-content: center;
@@ -392,7 +392,7 @@
       justify-content: center;
     }
 
-    @media (hover: none) and (pointer: coarse) {
+    @media (pointer: coarse) {
       .dpad.playing { display: flex; }
     }
 
@@ -537,7 +537,7 @@ const WIN_SCORE = 400;
 let GRID_SIZE, COLS, ROWS;
 
 function calcGrid() {
-  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const isMobile = window.matchMedia('(pointer: coarse)').matches;
   if (isMobile) {
     const containerW = window.innerWidth - 12; // 6px padding each side
     // title(28) + dpad(160) + padding(12) + hud(32) + gaps(18) + buffer(10)
@@ -590,7 +590,7 @@ function resizeCanvas() {
   canvas.width  = COLS * GRID_SIZE;
   canvas.height = ROWS * GRID_SIZE;
   // On mobile, pin canvas to exact pixel dimensions to prevent CSS upscaling/distortion
-  if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+  if (window.matchMedia('(pointer: coarse)').matches) {
     canvas.style.width  = canvas.width  + 'px';
     canvas.style.height = canvas.height + 'px';
   } else {

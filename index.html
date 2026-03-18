@@ -85,9 +85,8 @@
     #hs-display    { text-align: center; flex: 1; }
     #level-display { min-width: 60px; text-align: right; }
 
-    /* Wall toggle switch */
-    .wall-toggle-btn {
-      all: unset;
+    /* Wall mode selector — two side-by-side buttons */
+    .wall-selector {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -99,35 +98,35 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .wall-toggle-btn .toggle-track {
-      width: 48px;
-      height: 26px;
-      border-radius: 13px;
-      background: #6c757d;
-      position: relative;
-      transition: background 0.25s;
-      flex-shrink: 0;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    .wall-selector {
+      gap: 0;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
     }
 
-    .wall-toggle-btn.wrap-mode .toggle-track {
+    .wall-opt {
+      all: unset;
+      padding: 9px 20px;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #ccc;
+      color: #555;
+      transition: background 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .wall-opt:first-child { border-radius: 24px 0 0 24px; }
+    .wall-opt:last-child  { border-radius: 0 24px 24px 0; }
+
+    .wall-opt.selected {
+      background: #f4a261;
+      color: white;
+    }
+
+    .wall-opt.wrap-selected.selected {
       background: #0077b6;
-    }
-
-    .wall-toggle-btn .toggle-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: white;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: transform 0.25s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    }
-
-    .wall-toggle-btn.wrap-mode .toggle-thumb {
-      transform: translateX(22px);
     }
 
     canvas {
@@ -480,10 +479,10 @@
     <p>Eat <strong>400 points</strong> worth to become a butterfly 🦋</p>
     <p class="subtitle">Arrow keys to move &nbsp;|&nbsp; Swipe or use buttons on mobile</p>
     <input class="name-input" id="player-name" type="text" maxlength="16" placeholder="Your name" autocomplete="off">
-    <button id="wall-toggle" class="wall-toggle-btn">
-      <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label">🧱 Walls ON</span>
-    </button>
+    <div class="wall-selector" id="wall-selector-start">
+      <button class="wall-opt selected" data-walls="true">🧱 Walls</button>
+      <button class="wall-opt wrap-selected" data-walls="false">🌀 Wrap</button>
+    </div>
     <button id="start-btn">Let's Eat!</button>
   </div>
 
@@ -492,10 +491,10 @@
     <h2>Oh no!<br>The caterpillar got a tummy ache! 🤒</h2>
     <p class="score-big" id="final-score">0</p>
     <p id="final-hs-msg"></p>
-    <button id="wall-toggle-over" class="wall-toggle-btn">
-      <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label">🧱 Walls ON</span>
-    </button>
+    <div class="wall-selector" id="wall-selector-over">
+      <button class="wall-opt selected" data-walls="true">🧱 Walls</button>
+      <button class="wall-opt wrap-selected" data-walls="false">🌀 Wrap</button>
+    </div>
     <button id="restart-btn">Try Again!</button>
   </div>
 
@@ -508,7 +507,7 @@
     <div id="leaderboard">
       <h3>🏆 Fastest Wins</h3>
       <table id="lb-table">
-        <thead><tr><th>#</th><th>Name</th><th>Time</th><th>Date</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Round</th><th>Time</th><th>Date</th></tr></thead>
         <tbody id="lb-body"></tbody>
       </table>
     </div>
@@ -531,7 +530,9 @@
 // =============================================================================
 // 1. CONSTANTS
 // =============================================================================
-const WIN_SCORE = 400;
+const WIN_SCORE_BASE = 400;
+const WIN_SCORE_INC  = 100;
+function winTarget() { return WIN_SCORE_BASE + (round - 1) * WIN_SCORE_INC; }
 
 // Dynamic grid — calculated based on screen size
 let GRID_SIZE, COLS, ROWS;
@@ -718,7 +719,7 @@ function update() {
     updateHUD();
 
     // Win condition
-    if (score >= WIN_SCORE) {
+    if (score >= winTarget()) {
       segments.unshift(newHead); // add head before triggering win
       triggerWin();
       return;
@@ -1234,11 +1235,11 @@ document.getElementById('btn-right').addEventListener('touchstart', e => { dpadP
 // 10. UI
 // =============================================================================
 function updateHUD() {
-  document.getElementById('score-display').textContent = `Score: ${score}`;
+  document.getElementById('score-display').textContent = `Score: ${score}/${winTarget()}`;
   document.getElementById('hs-display').textContent    = `Best: ${getHighScore()}`;
   let level = 1;
   for (const t of SPEED_THRESHOLDS) { if (score >= t.score) level = t.level; }
-  document.getElementById('level-display').textContent = `Level ${level}`;
+  document.getElementById('level-display').textContent = `R${round} Lv${level}`;
 }
 
 function announceFood(food) {
@@ -1312,6 +1313,7 @@ function showWinScreen(winTimeSecs) {
     tr.innerHTML = `
       <td>${['🥇','🥈','🥉','4.','5.'][i]}</td>
       <td>${entry.name || 'Player'}</td>
+      <td>${entry.round ? `R${entry.round}` : 'R1'}</td>
       <td>${formatTime(entry.time)}</td>
       <td>${entry.date}</td>
     `;
@@ -1321,15 +1323,14 @@ function showWinScreen(winTimeSecs) {
   document.getElementById('win-screen').style.display = 'flex';
 }
 
-// Wall toggle — syncs all toggle buttons on the page
+// Wall selector — syncs both selectors on the page
 function updateWallToggle() {
-  const label = wallsEnabled ? '🧱 Walls ON' : '🌀 Wrap ON';
-  ['wall-toggle', 'wall-toggle-over'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.classList.toggle('wrap-mode', !wallsEnabled);
-    const lbl = btn.querySelector('.toggle-label');
-    if (lbl) lbl.textContent = label;
+  ['wall-selector-start', 'wall-selector-over'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.querySelectorAll('.wall-opt').forEach(btn => {
+      btn.classList.toggle('selected', (btn.dataset.walls === 'true') === wallsEnabled);
+    });
   });
 }
 
@@ -1355,7 +1356,7 @@ function getLeaderboard() {
 function saveWinTime(seconds) {
   const board = getLeaderboard();
   const date  = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  board.push({ time: seconds, date, name: playerName });
+  board.push({ time: seconds, date, name: playerName, round });
   board.sort((a, b) => a.time - b.time);   // fastest first
   board.splice(5);                          // keep top 5
   localStorage.setItem('vhc_leaderboard', JSON.stringify(board));
@@ -1402,9 +1403,11 @@ document.getElementById('restart-btn').addEventListener('click', () => startGame
 document.getElementById('play-again-btn').addEventListener('click', () => startGame(false));
 document.getElementById('next-round-btn').addEventListener('click', () => { round++; startGame(true); });
 
-['wall-toggle', 'wall-toggle-over'].forEach(id => {
-  document.getElementById(id)?.addEventListener('click', () => {
-    wallsEnabled = !wallsEnabled;
+['wall-selector-start', 'wall-selector-over'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', e => {
+    const btn = e.target.closest('.wall-opt');
+    if (!btn) return;
+    wallsEnabled = btn.dataset.walls === 'true';
     updateWallToggle();
   });
 });

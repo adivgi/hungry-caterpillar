@@ -346,16 +346,20 @@
 
     /* Dark mode toggle — lives in HUD */
     #dark-toggle {
-      background: none;
+      background: rgba(255,255,255,0.15);
       border: none;
-      font-size: 1rem;
+      border-radius: 50%;
+      font-size: 1.1rem;
       cursor: pointer;
-      padding: 0 2px;
-      line-height: 1;
-      opacity: 0.85;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s;
     }
-    #dark-toggle:hover { opacity: 1; }
+    #dark-toggle:hover { background: rgba(255,255,255,0.28); }
 
     /* Small screen adjustments */
     @media (max-width: 400px) {
